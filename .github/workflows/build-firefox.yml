@@ -33,8 +33,12 @@ jobs:
       - name: Zip Firefox extension
         run: pnpm --filter=@read-frog/extension zip:firefox
 
+      - name: Get Firefox extension path
+        id: extension-path
+        run: echo "path=$(ls apps/extension/.output/*-firefox.zip)" >> $GITHUB_OUTPUT
+
       - name: Upload Firefox extension artifact
         uses: actions/upload-artifact@v4
         with:
           name: read-frog-firefox-extension
-          path: apps/extension/.output/*.zip
+          path: ${{ steps.extension-path.outputs.path }}
