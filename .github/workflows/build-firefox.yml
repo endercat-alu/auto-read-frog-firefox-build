@@ -1,0 +1,42 @@
+name: Build Firefox Extension
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout read-frog repository
+        uses: actions/checkout@v4
+        with:
+          repository: mengxi-ream/read-frog
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        id: pnpm-install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Firefox extension
+        run: pnpm --filter=@read-frog/extension build:firefox
+
+      - name: Zip Firefox extension
+        run: pnpm --filter=@read-frog/extension zip:firefox
+
+      - name: Upload Firefox extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: read-frog-firefox-extension
+          path: apps/extension/.output/*.zip
